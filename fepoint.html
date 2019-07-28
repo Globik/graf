@@ -1,0 +1,32 @@
+<html><head><title>fepoint</title><style>.svg-path{border:1px solid green;}</style></head><body>
+<div>
+<input type="range" min="0" max="1000" value="90" oninput="wasZ(this);"><label>z: <span id="spZ"></span></label>
+<input type="range" min="0" max="1000" value="90" oninput="wasX(this);"><label>x: <span id="spX"></span></label>
+<input type="range" min="0" max="1000" value="90" oninput="wasY(this);"><label>y: <span id="spY"></span></label>
+</div>
+<svg  class="svg-path" version="1.0" xmlns="http://www.w3.org/2000/svg"
+ width="601.000000pt" height="400.000000pt" viewBox="0 0 801.000000 1080.000000"
+ preserveAspectRatio="xMidYMid meet">
+ <defs>
+ <filter id="spotlight">
+ <feSpecularLighting result="spotlight" specularConstant="3.5" specularExponent="200" lighting-color="#ffc">
+ <fePointLight id="fpl" x="100" y="100" z="420"/>
+ </feSpecularLighting>
+ <feComposite in="SourceGraphic" in2="spotlight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
+ </filter>
+ </defs>
+<path fill="none" style="filter:url(#spotlight);" stroke="deeppink" stroke-width="14" stroke-miterlimit="0"
+  d="M11.6 269s-19.7-42.4 6.06-68.2 48.5-6.06 59.1 12.1l-3.03 28.8 209-227s45.5-21.2 60.6 1.52c15.2 22.7-3.03 47-3.03 47l-225 229s33.1-12 48.5 7.58c50 63.6-50 97-62.1 37.9"
+/>
+<script>
+function wasZ(el){	
+fpl.setAttribute("z", el.value);
+spZ.textContent=el.value;
+}
+function wasX(el){	
+fpl.setAttribute("x", el.value);
+spX.textContent=el.value;
+}
+</script>
+</body>
+</html>
