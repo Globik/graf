@@ -1,0 +1,387 @@
+<html><head><title>lighting</title><style>
+	@import url('https://fonts.googleapis.com/css?family=Cardo');
+
+* {
+  margin: 0;
+  padding: 0;
+  position: relative;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+}
+body {
+  background-image: linear-gradient(to bottom, #555, #222);
+}
+
+#hdg-1 {
+  color: #000;
+  text-align: center;
+  font-family: 'Cardo', serif;
+  font-weight: bold;
+  font-weight: 400;
+  font-size: 6rem;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  outline: none;
+  backface-visibility: hidden;
+}
+
+.filter-container {
+  visibility: hidden;
+  width: 0;
+  height: 0;
+}
+</style></head><body>
+<h1 id="hdg-1" contenteditable spellcheck="false">Non WebGL<br>Lighting<br>by<br>SVG Filter</h1>
+<script>
+	
+	class SvgFilter {
+  constructor(filtername) {
+    this.filtername = filtername;
+    this.sourceGraphic = 'SourceGraphic';
+    this.sourceAlpha = 'SourceAlpha';
+    this.clear();
+  }
+
+  clear() {
+    this.layerCount = {
+      'blend'            : 0,
+      'colorMatrix'      : 0,
+      'componentTransfer': 0,
+      'composite'        : 0,
+      'convolveMatrix'   : 0,
+      'diffuseLighting'  : 0,
+      'displacementMap'  : 0,
+      'flood'            : 0,
+      'gaussianBlur'     : 0,
+      'image'            : 0,
+      'merge'            : 0,
+      'turbulence'       : 0,
+      'morphology'       : 0,
+      'offset'           : 0,
+      'specularLighting' : 0,
+      'tile'             : 0
+    };
+    this.stack = [];
+  }
+
+  // color & composite
+  //----------------------------------------
+  addBlend({ in1, in2, mode }) {
+    const result = 'blend' + (++this.layerCount['blend']);
+    const tag = `<feBlend in="${ in1 }" in2="${ in2 }" mode="${ mode }" result="${ result }" />`;
+    this.stack.push(tag);
+    return result;
+  }
+
+  addColorMatrix({ in1, colorInterpolationFilters, type, values }) {
+    const result = 'colorMatrix' + (++this.layerCount['colorMatrix']);
+    let tag = `<feColorMatrix in="${ in1 }" `;
+    if(colorInterpolationFilters) tag += `color-interpolation-filters="${ colorInterpolationFilters }" `;
+    tag += `type="${ type }" values="${ values.join(' ') }" result="${ result }" />`;
+    this.stack.push(tag);
+    return result;
+  }
+
+  addComponentTransfer({ in1, channelFunctions }) {
+    const result = 'componentTransfer' + (++this.layerCount['componentTransfer']);
+    const tag = `<feComponentTransfer in="${ in1 }" result="${ result }">
+        ${ channelFunctions.join('\n        ') }
+      </feComponentTransfer>`;
+    this.stack.push(tag);
+    return result;
+  }
+
+  channelFunc({ channel, type, tableValues, slope, intercept, amplitude, exponent, offset }) {
+    let tag = `<feFunc${ channel } type="${ type }" `;
+    tag += (type === 'identity'                    ) ? '/>':
+           (type === 'table' || type === 'discrete') ? `tableValues="${ tableValues.join(' ') }" />`:
+           (type === 'linear'                      ) ? `slope="${ slope }" intercept="${ intercept }" />`:
+           (type === 'gamma'                       ) ? `amplitude="${ amplitude }" exponent="${ exponent }" offset="${ offset }" />`: '/>';
+    return tag;
+  }
+
+  addComposite({ in1, in2, operator, k1, k2, k3, k4 }) {
+    const result = 'composite' + (++this.layerCount['composite']);
+    let tag = `<feComposite in="${ in1 }" in2="${ in2 }" operator="${ operator }" `;
+    if(k1) tag += `k1="${ k1 }" `;
+    if(k2) tag += `k2="${ k2 }" `;
+    if(k3) tag += `k3="${ k3 }" `;
+    if(k4) tag += `k4="${ k4 }" `;
+    tag += `result="${ result }" />`;
+    this.stack.push(tag);
+    return result;
+  }
+
+  addMerge({ mergeNodes }) {
+    const result = 'merge' + (++this.layerCount['merge']);
+    let tag = `<feMerge result="${ result }">\n`;
+    for(const node of mergeNodes) tag += `        <feMergeNode in="${ node }" />\n`;
+    tag += '      </feMerge>';
+    this.stack.push(tag);
+    return result;
+  }
+
+  addConvolveMatrix({ in1, order, kernelMatrix, divisor, bias, targetX, targetY, edgeMode, kernelUnitLength, preserveAlpha }) {
+    const result = 'convolveMatrix' + (++this.layerCount['convolveMatrix']);
+    let tag = `<feConvolveMatrix in="${ in1 }" `;
+    if(order)            tag += `order="${ order }" `;
+    if(kernelMatrix)     tag += `kernelMatrix="${ kernelMatrix }" `;
+    if(divisor)          tag += `divisor="${ divisor }" `;
+    if(bias)             tag += `bias="${ bias }" `;
+    if(targetX)          tag += `targetX="${ targetX }" `;
+    if(targetY)          tag += `targetY="${ targetY }" `;
+    if(edgeMode)         tag += `edgeMode="${ edgeMode }" `;
+    if(kernelUnitLength) tag += `kernelUnitLength="${ kernelUnitLength }" `;
+    if(preserveAlpha)    tag += `preserveAlpha="${ preserveAlpha }" `;
+    this.stack.push(tag);
+    return result;
+  }
+
+  // lighting
+  //----------------------------------------
+  addDiffuseLighting({ in1, surfaceScale, diffuseConstant, kernelUnitLength, lightingColor, light }) {
+    const result = 'diffuseLighting' + (++this.layerCount['diffuseLighting']);
+    let tag = `<feDiffuseLighting in="${ in1 }" `;
+    if(surfaceScale)     tag += `surfaceScale="${ surfaceScale }" `;
+    if(diffuseConstant)  tag += `diffuseConstant="${ diffuseConstant }" `;
+    if(kernelUnitLength) tag += `kernelUnitLength="${ kernelUnitLength }" `;
+    if(lightingColor)    tag += `lighting-color="${ lightingColor }" `;
+    tag += `result="${ result }">
+        ${ light }
+      </feDiffuseLighting>`;
+    this.stack.push(tag);
+    return result;
+  }
+
+  addSpecularLighting({ in1, surfaceScale, specularConstant, specularExponent, kernelUnitLength, lightingColor, light }) {
+    const result = 'specularLighting' + (++this.layerCount['specularLighting']);
+    let tag = `<feSpecularLighting in="${ in1 }" `;
+    if(surfaceScale)     tag += `surfaceScale="${ surfaceScale }" `;
+    if(specularConstant) tag += `specularConstant="${ specularConstant }" `;
+    if(specularExponent) tag += `specularExponent="${ specularExponent }" `;
+    if(kernelUnitLength) tag += `kernelUnitLength="${ kernelUnitLength }" `;
+    if(lightingColor)    tag += `lighting-color="${ lightingColor }" `;
+    tag += ` result="${ result }">
+        ${ light }
+      </feSpecularLighting>`;
+    this.stack.push(tag);
+    return result;
+  }
+
+  pointLight({ x, y, z }) {
+    let tag = `<fePointLight `;
+    if(x) tag += `x="${ x }" `;
+    if(y) tag += `y="${ y }" `;
+    if(z) tag += `z="${ z }" `;
+    tag += `/>`;
+    return tag;
+  }
+
+  spotLight({ x, y, z, pointsAtX, pointsAtY, pointsAtZ, specularExponent, limitingConeAngle }) {
+    let tag = `<feSpotLight `;
+    if(x)                 tag += `x="${ x }" `;
+    if(y)                 tag += `y="${ y }" `;
+    if(z)                 tag += `z="${ z }" `;
+    if(pointsAtX)         tag += `pointsAtX="${ pointsAtX }" `;
+    if(pointsAtY)         tag += `pointsAtY="${ pointsAtY }" `;
+    if(pointsAtZ)         tag += `pointsAtZ="${ pointsAtZ }" `;
+    if(specularExponent)  tag += `specularExponent="${ specularExponent }" `;
+    if(limitingConeAngle) tag += `limitingConeAngle="${ limitingConeAngle }" `;
+    tag += `/>`;
+    return tag;
+  }
+
+  distantLight({ azimuth, elevation }) {
+    return `<feDistantLight azimuth="${ azimuth }" elevation="${ elevation }" />`;
+  }
+
+  // generate
+  //----------------------------------------
+  addFlood({ color, opacity }) {
+    const result = 'flood' + (++this.layerCount['flood']);
+    let tag = `<feFlood flood-color="${ color }" `;
+    if(opacity) tag += `flood-opacity="${ opacity }" `;
+    tag += `result="${ result }" />`;
+    this.stack.push(tag);
+    return result;
+  }
+
+  addTurbulence({ type, baseFrequency, numOctaves, seed, stitchTiles }) {
+    const result = 'turbulence' + (++this.layerCount['turbulence']);
+    let tag = `<feTurbulence type="${ type }" baseFrequency="${ baseFrequency.join(' ') }" `;
+    if(numOctaves)  tag += `numOctaves="${ numOctaves }" `;
+    if(seed)        tag += `seed="${ seed }" `;
+    if(stitchTiles) tag += `stitchTiles="${ stitchTiles }" `;
+    tag += `result="${ result }"`;
+    this.stack.push(tag);
+    return result;
+  }
+
+  addImage({ href, preserveAspectRatio, x, y, w, h }) {
+    const result = 'image' + (++this.layerCount['image']);
+    let tag = `<feImage xlink:href="${ href }" `;
+    if(preserveAspectRatio) tag += `preserveAspectRatio="${ preserveAspectRatio }" `;
+    if(x)                   tag += `x="${ x }" `;
+    if(y)                   tag += `y="${ y }" `;
+    if(w)                   tag += `w="${ w }" `;
+    if(h)                   tag += `h="${ h }" `;
+    tag += `result="${ result }" />`;
+    this.stack.push(tag);
+    return result;
+  }
+
+  // offset
+  //----------------------------------------
+  addOffset({ in1, dx, dy }) {
+    const result = 'offset' + (++this.layerCount['offset']);
+    let tag = `<feOffset in="${ in1 }" `;
+    if(dx) tag += `dx="${ dx }" `;
+    if(dy) tag += `dy="${ dy }" `;
+    tag += `result="${ result }" />`;
+    this.stack.push(tag);
+    return result;
+  }
+
+  addDisplacementMap({ in1, in2, scale, xChannelSelector, yChannelSelector }) {
+    const result = 'displacementMap' + (++this.layerCount['displacementMap']);
+    let tag = `<feDisplacementMap in="${ in1 }" in2="${ in2 }" `;
+    tag += `scale="${ scale }" `;
+    if(xChannelSelector) tag += `xChannelSelector="${ xChannelSelector }" `;
+    if(yChannelSelector) tag += `yChannelSelector="${ yChannelSelector }" `;
+    tag += `result="${ result }" />`;
+    this.stack.push(tag);
+    return result;
+  }
+
+  addTile({ in1, x, y, w, h }) {
+    const result = 'tile' + (++this.layerCount['tile']);
+    let tag = `<feTile in="${ in1 }"`;
+    if(x) tag += `x="${ x }" `;
+    if(y) tag += `y="${ y }" `;
+    if(w) tag += `w="${ w }" `;
+    if(h) tag += `h="${ h }" `;
+    tag += `result="${ result }" />`;
+    this.stack.push(tag);
+    return result;
+  }
+
+  // effect
+  //----------------------------------------
+  addGaussianBlur({ in1, stdDeviation, edgeMode }) {
+    const result = 'gaussianBlur' + (++this.layerCount['gaussianBlur']);
+    let tag = `<feGaussianBlur in="${ in1 }" stdDeviation="${ stdDeviation }" `;
+    if(edgeMode) tag += `edgeMode="${ edgeMode }" `;
+    tag += `result="${ result }" />`;
+    this.stack.push(tag);
+    return result;
+  }
+
+  addMorphology({ in1, operator, radius }) {
+    const result = 'morphology' + (++this.layerCount['morphology']);
+    const tag = `<feMorphology in="${ in1 }" operator="${ operator }" radius="${ radius }" result="${ result }" />`;
+    this.stack.push(tag);
+    return result;
+  }
+
+
+  // to SVG Element
+  //----------------------------------------
+  toString() {
+    return `<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+    <filter id="${ this.filtername }" filterUnits="objectBoundingBox">
+      ${ this.stack.join('\n      ') }
+    </filter>
+  </defs>
+</svg>`;
+  }
+
+  // Chrome: [Deprecation] Using unescaped '#' characters in a data URI body is deprecated
+  // https://www.chromestatus.com/features/5656049583390720
+  toDataUri() {
+    const compressed = this.toString().replace(/\n\s*/g, ' ').replace(/>\s</g, '><');
+    return `'data:image/svg+xml;utf8,${ encodeURIComponent(compressed) }#${ this.filtername }'`;
+  }
+};
+
+// DynamicSvgFilter class
+//----------------------------------------
+class DynamicSvgFilter {
+  constructor(elementId) {
+    this.element = document.getElementById(elementId);
+
+    // create filter-container
+    this.filterContainerId = `filter-container-${ elementId }`;
+    this.element.insertAdjacentHTML('beforebegin', `<div id="${ this.filterContainerId }" class="filter-container"></div>`);
+    this.eFilterContainer = document.getElementById(this.filterContainerId);
+
+    this.index = 0;
+    this.update();// start animation
+  }
+
+  update() {
+    const frame = window.requestAnimationFrame(() => { this.update(); });
+    const sec = performance.now() / 1000;
+
+    const filter = new SvgFilter(`filter-${ this.index }`);// #filter-0 -> #filter-1 (-> #filter-0)
+    const src = filter.sourceGraphic;
+    const alpha = filter.sourceAlpha;
+    const light  = filter.addSpecularLighting({
+      in1: src,
+      lightingColor: '#fff',
+      specularExponent: 40,
+      light: filter.pointLight({ x: Math.cos(sec) * 500, y: Math.sin(sec) * 500, z: 220 })
+    });
+    const mask = filter.addColorMatrix({// create mask from sourceAlpha
+      in1: alpha,
+      colorInterpolationFilters: 'sRGB',
+      type: 'matrix',
+      values: [
+        0, 0, 0, 1, 0,
+        0, 0, 0, 1, 0,
+        0, 0, 0, 1, 0,
+        0, 0, 0, 1, 0
+      ]
+    });
+    const lightMask = filter.addComposite({ in1: mask, in2: light, operator: 'in' });
+    const merge = filter.addMerge({ mergeNodes: [src, lightMask] });
+
+    this.eFilterContainer.innerHTML = filter.toString();// update svg
+    this.element.setAttribute('style', `filter: url(#${ filter.filtername });`);// reset filter style
+    this.index = (this.index + 1) % 2;// swap index : 0 -> 1 (-> 0)
+  }
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  const filter = new DynamicSvgFilter('hdg-1');
+});
+</script>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</body></html>

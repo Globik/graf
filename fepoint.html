@@ -12,7 +12,14 @@
  <feSpecularLighting result="spotlight" specularConstant="3.5" specularExponent="200" lighting-color="#ffc">
  <fePointLight id="fpl" x="100" y="100" z="420"/>
  </feSpecularLighting>
- <feComposite in="SourceGraphic" in2="spotlight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
+ <feComposite in="SourceGraphic" in2="spotlight" result="fuck" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
+ <feOffset in="SourceAlpha" dx="5" dy="5" result="offset2"/>
+ <feGaussianBlur in="offset2" stdDeviation="5" result="blur2"/>
+ <feMerge>
+ <feMergeNode in="blur2"/>
+ <feMergeNode in="SourceGraphic" />
+ <feMergeNode in="fuck" />
+ </feMerge>
  </filter>
  </defs>
 <path fill="none" style="filter:url(#spotlight);" stroke="deeppink" stroke-width="14" stroke-miterlimit="0"
@@ -26,6 +33,10 @@ spZ.textContent=el.value;
 function wasX(el){	
 fpl.setAttribute("x", el.value);
 spX.textContent=el.value;
+}
+function wasY(el){	
+fpl.setAttribute("y", el.value);
+spY.textContent=el.value;
 }
 </script>
 </body>
