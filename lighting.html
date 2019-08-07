@@ -22,7 +22,7 @@ body {
   font-family: 'Cardo', serif;
   font-weight: bold;
   font-weight: 400;
-  font-size: 6rem;
+  font-size: 3rem;
 
   position: absolute;
   top: 50%;
@@ -34,12 +34,14 @@ body {
 }
 
 .filter-container {
-  visibility: hidden;
-  width: 0;
-  height: 0;
+  isibility: hidden;
+  width: 100;
+  height: 100;
 }
 </style></head><body>
+	
 <h1 id="hdg-1" contenteditable spellcheck="false">Non WebGL<br>Lighting<br>by<br>SVG Filter</h1>
+<output id="out" style="border:1px solid red;"></output>
 <script>
 	
 	class SvgFilter {
@@ -329,7 +331,7 @@ class DynamicSvgFilter {
 
   update() {
     const frame = window.requestAnimationFrame(() => { this.update(); });
-    const sec = performance.now() / 1000;
+    const sec = performance.now() / 1000/2;
 
     const filter = new SvgFilter(`filter-${ this.index }`);// #filter-0 -> #filter-1 (-> #filter-0)
     const src = filter.sourceGraphic;
@@ -355,6 +357,8 @@ class DynamicSvgFilter {
     const merge = filter.addMerge({ mergeNodes: [src, lightMask] });
 
     this.eFilterContainer.innerHTML = filter.toString();// update svg
+    out.textContent=filter.toString();
+    //console.log('filter: ', filter.toString());
     this.element.setAttribute('style', `filter: url(#${ filter.filtername });`);// reset filter style
     this.index = (this.index + 1) % 2;// swap index : 0 -> 1 (-> 0)
   }
@@ -363,25 +367,23 @@ class DynamicSvgFilter {
 window.addEventListener('DOMContentLoaded', () => {
   const filter = new DynamicSvgFilter('hdg-1');
 });
-</script>
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+</script>	
+<!--
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+    <filter id="filter-1" filterUnits="objectBoundingBox">
+      <feSpecularLighting in="SourceGraphic" specularExponent="40" lighting-color="#fff"  result="specularLighting1">
+        <fePointLight x="500" z="220" />
+      </feSpecularLighting>
+      <feColorMatrix in="SourceAlpha" color-interpolation-filters="sRGB" type="matrix" values="0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0" result="colorMatrix1" />
+      <feComposite in="colorMatrix1" in2="specularLighting1" operator="in" result="composite1" />
+      <feMerge result="merge1">
+        <feMergeNode in="SourceGraphic" />
+        <feMergeNode in="composite1" />
+      </feMerge>
+    </filter>
+  </defs>
+</svg>
+-->
+
 </body></html>
