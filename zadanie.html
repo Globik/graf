@@ -1,0 +1,117 @@
+<html>
+<head><title>zadanie</title>
+<link href="task1.css" rel="stylesheet">
+<style>
+#myBox{color:purple;}
+.myBox{color:white;}
+div.myBox{color:red !important;}
+</style>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+</head>
+<body>
+<div id="box"><p id="myBox" class="myBox" style="color:red;">hello world</p></div>
+<style>
+#lox{transition:3s;width:100%;}
+#lox:hover{width:50px;color:red;}
+</style>
+<div id="lox" style="background:brown;">kuku</div>
+
+<div id="test">
+<div id="test_1">j1</div>
+<p id="test_2">jjj hh<button id="test_4">click</button></p>
+</div>
+<script>
+$("#test").find("*").css("border","3px solid red");
+</script>
+<div>john risig</div>
+<div>george</div>
+<div>johni</div>
+<div>J. Ohn</div>
+<div>super john</div>
+<script>
+$("div:contains('john')").css("text-decoration","underline");
+//let s='a'++'a'+'a'+'s';
+//console.log('s: ',s);
+//let count=0;
+//for(var count=0;count<10;count++){
+//setTimeout(()=>console.log(count),0);	
+//console.log(count);
+//}
+//count=5;
+//if(true){let count=10;}
+//console.log(count);
+var fruits=[{id:1,type:'apple',price:9},
+{id:2,type:'apple',price:8},
+{id:3,type:'orange',price:7},
+{id:4,type:'pineapple',price:10},
+{id:5,type:'pineapple',price:20}];
+
+var result = fruits.filter(function(el){return el.type !='apple';}).map(function(n){
+if(n.type == 'pineapple'){
+n.price = n.price*2;
+}
+return n;});
+console.log('result: ', result);
+
+var result2 = [];
+fruits.forEach(function(el, i){
+if(el.type == 'apple')return;
+if(el.type == 'pineapple')el.price = el.price*2;
+result2.push({id:el.id, type:el.type, price:el.price})
+})
+console.log('result2: ', result2);
+</script>
+</body>
+</html>
+<!-- 
+1. Цвет будет желтым.
+В подключаемой таблице значение !импортант к идентификатору имеет наивысший приоритет над инлайновым стилем. 
+Во встроенной же таблице в документе хтмл у идентификатора нет значения !импортант, которое могло б переопределить цвет.
+Кроме того классы с !импортант имеют наименьший приоритет перед идентификатором 
+со значением !импортант из подключаемой таблицы стилей.
+В свою очередь селектор типа div.myBox имеет низкий приоритет перед просто классом со значением !импортант
+
+2. Причина в том, что в начальном состоянии селектора не указана ширина элемента. 
+Нужно явно указать первоначальную ширину элемента. Например, выставить ее в сто процентов, тогда получится плавный переход.
+
+3. Можно, но тогда браузер типа интернет эксплорер версии девять откажется выполнять стандарт хтмл 5 верстки. Верстка поедет.
+
+4. Я б заменил инлайновую верстку и тег - в - на strong, так как это больше соответствует логике и нативно выделяет слова
+жирным шрифтом( и без инлайновых стилей к спанам)
+
+5. К элементам со всеми идентификаторами, начинающиеся с test.
+
+6. Выбирает элементы див, которые содержат слово John и подчеркивает нижним подчеркиванием найденное.
+
+7. 
+1. jpg - в статьях(артикулах) в качестве илюстраций - простота, да и прозрачность не нужна. 
+Видна пиксельная решетка при растягивании браузера.
+2. png - в логотипах. Прозрачность важна ради фона низлежащего. При растягивании браузера пользователем видна пиксельная решетка,
+что не есть хорошо.
+3. svg - отлично смотрится при растягивании браузера. Можно применять анимации, компоновать в спрайты(ради оптимизации времени загрузки сайта)
+ - иконки.
+ 
+8. Не прав. Вылетит ошибка, мол, в левой части что-т не то. На самом деле в правой части нельзя прибавлять двойным плюсом. Короче нонсенс.
+
+9. Десять раз десятку выведет. При каждой итерации свой таймаут. Пока таймаут сработает каунт уже до десяти просчитается.
+
+10. Пятерку выведет. Первый каунт в глобальной видимости. А в теле с тру переменная задана с let, что есть зона локальной видимомстию
+
+11. 
+var result = fruits.filter(function(el){return el.type !='apple';}).map(function(n){
+if(n.type == 'pineapple'){
+n.price = n.price*2;
+}
+return n;});
+console.log('result: ', result);
+
+var result2 = [];
+fruits.forEach(function(el, i){
+if(el.type == 'apple')return;
+if(el.type == 'pineapple')el.price = el.price*2;
+result2.push({id:el.id, type:el.type, price:el.price})
+})
+console.log('result2: ', result2);
+
+12. --
+-->

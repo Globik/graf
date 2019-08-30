@@ -3,26 +3,28 @@
 <input type="range" min="0" max="1000" value="90" oninput="wasZ(this);"><label>z: <span id="spZ"></span></label>
 <input type="range" min="0" max="1000" value="90" oninput="wasX(this);"><label>x: <span id="spX"></span></label>
 <input type="range" min="0" max="1000" value="90" oninput="wasY(this);"><label>y: <span id="spY"></span></label>
+<button onclick="go_now();">go</button>
 </div>
 <svg  class="svg-path" version="1.0" xmlns="http://www.w3.org/2000/svg"
  width="601.000000pt" height="400.000000pt" viewBox="0 0 801.000000 1080.000000"
  preserveAspectRatio="xMidYMid meet">
  <defs>
  <filter id="spotlight">
- <feSpecularLighting result="spotlight" specularConstant="3.5" specularExponent="200" lighting-color="#ffc">
- <fePointLight id="fpl" x="100" y="100" z="420"/>
+ <feSpecularLighting result="spotlight" specularConstant="3.5" specularExponent="40" lighting-color="#ffc">
+ <fePointLight id="fpl" x="100" y="100" z="352"/>
  </feSpecularLighting>
  <feComposite in="SourceGraphic" in2="spotlight" result="fuck" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
- <feOffset in="SourceAlpha" dx="5" dy="5" result="offset2"/>
- <feGaussianBlur in="offset2" stdDeviation="5" result="blur2"/>
+ <feOffset in="SourceAlpha" dx="1" dy="1" result="offset2"/>
+ <feGaussianBlur in="offset2" stdDeviation="4" result="blur2"/>
  <feMerge>
  <feMergeNode in="blur2"/>
  <feMergeNode in="SourceGraphic" />
  <feMergeNode in="fuck" />
+ 
  </feMerge>
  </filter>
  </defs>
-<path fill="none" style="filter:url(#spotlight);" stroke="deeppink" stroke-width="14" stroke-miterlimit="0"
+<path fill="none" style="filter:url(#spotlight);" stroke="black" stroke-width="14" stroke-miterlimit="0"
   d="M11.6 269s-19.7-42.4 6.06-68.2 48.5-6.06 59.1 12.1l-3.03 28.8 209-227s45.5-21.2 60.6 1.52c15.2 22.7-3.03 47-3.03 47l-225 229s33.1-12 48.5 7.58c50 63.6-50 97-62.1 37.9"
 />
 <script>
@@ -37,6 +39,15 @@ spX.textContent=el.value;
 function wasY(el){	
 fpl.setAttribute("y", el.value);
 spY.textContent=el.value;
+}
+function go_now(){
+update();	
+}
+function update(){
+requestAnimationFrame(function(){update();})	
+var sec=performance.now()/1000;
+fpl.setAttribute("x", Math.cos(sec)*500);
+fpl.setAttribute("y", Math.sin(sec)*500);
 }
 </script>
 </body>

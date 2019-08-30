@@ -360,7 +360,7 @@ class DynamicSvgFilter {
     out.textContent=filter.toString();
     //console.log('filter: ', filter.toString());
     this.element.setAttribute('style', `filter: url(#${ filter.filtername });`);// reset filter style
-    this.index = (this.index + 1) % 2;// swap index : 0 -> 1 (-> 0)
+    this.index = 1;// (this.index + 1) % 2;// swap index : 0 -> 1 (-> 0)
   }
 };
 

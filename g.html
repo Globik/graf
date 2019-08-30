@@ -24,18 +24,54 @@
 		 svg{margin:0 auto;}
 		 path{
 			 stroke:black;
+			 fill:red;
+			 ilter:url(#spotlight);
 			 }
+			 g{filter:url(#spotlight);}
+			
  </style>
  </head></html>
+ <div>
+<input type="range" min="0" max="1000" value="90" oninput="wasX(this);"><label>x: <span id="spX"></span></label>
  <button onclick="was();">start</button>
+ <button onclick="god();">go</button>
+ </div>
 <svg  class="svg-path" version="1.0" xmlns="http://www.w3.org/2000/svg"
  width="400.000000pt" height="500.000000pt" viewBox="0 0 801.000000 1080.000000" preserveAspectRatio="xMidYMid meet">
 <!-- width="801.000000pt" height="1080.000000pt" viewBox="0 0 801.000000 1080.000000" -->
+<defs>
+	<!--
+ <filter id="spotlight" filterUnits="objectBoundingBox">
+ <feSpecularLighting result="spotlight" surfaceScale="50" specularConstant="10.5" specularExponent="40" 
+ kernelUnitLength="10 10" lighting-color="red">
+ <fePointLight id="fpl" x="100" y="100" z="1000"/> 
+ </feSpecularLighting>
+ <feComposite in="SourceGraphic" in2="spotlight" result="fuck" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
+ <feOffset in="SourceAlpha" dx="1" dy="1" result="offset2"/>
+ <feGaussianBlur in="offset2" stdDeviation="10" result="blur2"/>
+ <feMerge>
+ <feMergeNode in="blur2"/>
+ <feMergeNode in="SourceGraphic" />
+ <feMergeNode in="fuck" />
+ 
+ </feMerge>
+ </filter>
+ -->
+ <filter id="spotlight" ilterUnits="objectBoundingBox">
+      <feSpecularLighting in="SourceGraphic" specularConstant="20.5" specularExponent="200" lighting-color="green"  result="specularLighting1">
+      <fePointLight id="fpl" x="700" y="1000" z="1920" />
+      </feSpecularLighting>
+      <feColorMatrix in="SourceAlpha" color-interpolation-filters="sRGB" type="matrix" values="0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0" result="colorMatrix1" />
+      <feComposite in="colorMatrix1" in2="specularLighting1" operator="in" result="composite1" />
+      <feMerge result="merge1">
+        <feMergeNode in="SourceGraphic" />
+        <feMergeNode in="composite1" />
+      </feMerge>
+    </filter>
+ </defs>
+<g fill="black" transform="translate(100.000000,1080.000000) scale(0.400000,-0.100000)" class="duka">
 
-<g transform="translate(0.000000,1080.000000) scale(0.100000,-0.100000)"
-fill="#000000" stroke="none">
-
-<path fill="none"  stroke-width="14" stroke-miterlimit="0" d="M7967 9050 c-14 -11 -29 -20 -34 -21 -4 0 -28 -15 -52 -33 -47 -33
+<path stroke="black" stroke-width="14" stroke-miterlimit="0" d="M7967 9050 c-14 -11 -29 -20 -34 -21 -4 0 -28 -15 -52 -33 -47 -33
 -67 -63 -90 -131 -21 -63 -38 -85 -68 -85 -14 0 -23 -3 -20 -7 4 -3 -2 -16
 -14 -29 -19 -21 -22 -21 -67 -8 -58 18 -93 11 -151 -30 -53 -38 -58 -48 -29
 -61 50 -22 25 -78 -40 -89 -84 -13 -142 -16 -142 -6 0 6 -27 9 -65 7 -63 -3
@@ -1457,6 +1493,21 @@ path[i].style.transition  = 'stroke-dashoffset 4s ease-in-out';
 // Go!
 path[i].style.strokeDashoffset = '0';
 }
+}
+
+function wasX(el){	
+fpl.setAttribute("x", el.value);
+spX.textContent=el.value;
+}
+
+function god(){
+update();
+}
+function update(){
+requestAnimationFrame(function(){update();})	
+var sec=performance.now()/1000;
+fpl.setAttribute("x", 300*Math.cos(sec)*50000);
+fpl.setAttribute("y", 300*Math.sin(sec)*50000);
 }
 </script>
 </body></html>
